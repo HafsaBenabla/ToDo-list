@@ -1,71 +1,73 @@
-// src/TodoList.jsx
+import { useState } from "react";
+import { CheckCircleIcon, XCircleIcon, PlusIcon } from "@heroicons/react/24/solid";
 
-import { useState } from 'react';
+export default function ToDoList() {
+    const [tasks, setTasks] = useState([]);
+    const [inputValue, setInputValue] = useState("");
 
-function TodoList() {
-    const [newTodo, setNewTodo] = useState('');
-    const [todos, setTodos] = useState([]);
-
-    const handleAddTodo = () => {
-        if (newTodo.trim()) {
-            setTodos([
-                ...todos,
-                { id: Date.now(), text: newTodo, completed: false },
-            ]);
-            setNewTodo('');
+    const addTask = () => {
+        if (inputValue.trim() !== "") {
+            setTasks([...tasks, { text: inputValue, completed: false }]);
+            setInputValue("");
         }
     };
 
-    const handleToggleTodo = (id) => {
-        setTodos(
-            todos.map((todo) =>
-                todo.id === id ? { ...todo, completed: !todo.completed } : todo
-            )
-        );
+    const toggleTask = (index) => {
+        const newTasks = [...tasks];
+        newTasks[index].completed = !newTasks[index].completed;
+        setTasks(newTasks);
     };
 
-    const handleDeleteTodo = (id) => {
-        setTodos(todos.filter((todo) => todo.id !== id));
+    const deleteTask = (index) => {
+        const newTasks = tasks.filter((_, i) => i !== index);
+        setTasks(newTasks);
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 p-6">
-            <div className="max-w-md mx-auto bg-white p-4 rounded-lg shadow-lg">
-                <h1 className="text-2xl font-bold mb-4 text-center">To-Do List</h1>
-                <div className="mb-4 flex">
+        <div className="min-h-screen flex items-center justify-center bg-white p-6">
+            <div className="bg-blue-50 shadow-lg rounded-xl p-6 w-full max-w-lg border border-blue-100">
+                <h2 className="text-2xl font-semibold text-gray-700 mb-6 text-center">To Do List</h2>
+
+                {/* Barre d'ajout */}
+                <div className="flex gap-3 mb-6">
                     <input
                         type="text"
-                        value={newTodo}
-                        onChange={(e) => setNewTodo(e.target.value)}
-                        className="flex-1 p-2 border border-gray-300 rounded"
-                        placeholder="Add a new task"
+                        className="flex-1 p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-300 shadow-sm"
+                        placeholder="Ajouter une tâche..."
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
                     />
                     <button
-                        onClick={handleAddTodo}
-                        className="ml-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        onClick={addTask}
+                        className="bg-blue-500 text-white px-4 py-3 rounded-lg flex items-center justify-center hover:bg-blue-600 transition shadow-md"
                     >
-                        Add
+                        <PlusIcon className="h-6 w-6" />
                     </button>
                 </div>
 
-                <ul>
-                    {todos.map((todo) => (
+                {/* Liste des tâches */}
+                <ul className="space-y-3">
+                    {tasks.map((task, index) => (
                         <li
-                            key={todo.id}
-                            className={`flex items-center justify-between p-2 mb-2 rounded-lg border ${todo.completed ? 'bg-green-100' : 'bg-gray-100'}`}
+                            key={index}
+                            className={`flex justify-between items-center p-3 rounded-lg shadow-sm border transition ${task.completed ? "bg-gray-100 text-gray-500 line-through" : "bg-white hover:bg-gray-50"
+                                }`}
                         >
-                            <span
-                                onClick={() => handleToggleTodo(todo.id)}
-                                className={`cursor-pointer ${todo.completed ? 'line-through text-gray-500' : 'text-black'}`}
-                            >
-                                {todo.text}
-                            </span>
-                            <button
-                                onClick={() => handleDeleteTodo(todo.id)}
-                                className="text-red-500"
-                            >
-                                Delete
-                            </button>
+                            <span className="text-base font-medium">{task.text}</span>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => toggleTask(index)}
+                                    className="text-green-500 hover:text-green-600 transition"
+                                >
+                                    <CheckCircleIcon className="w-6 h-6" />
+                                </button>
+                                <button
+                                    onClick={() => deleteTask(index)}
+                                    className="text-red-500 hover:text-red-600 transition"
+                                >
+                                    <XCircleIcon className="w-6 h-6" />
+                                </button>
+                            </div>
                         </li>
                     ))}
                 </ul>
@@ -73,5 +75,3 @@ function TodoList() {
         </div>
     );
 }
-
-export default TodoList;
